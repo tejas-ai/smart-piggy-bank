@@ -94,6 +94,16 @@ export default function Home() {
     playSound("https://www.soundjay.com/misc/sounds/button-4.mp3");
   };
 
+  const handleGoalUpdate = () => {
+    const goalAmount = parseInt(newGoal);
+    if (goalAmount && goalAmount > 0) {
+      // In a real app, this would update the goal via API
+      // For now, just close the modal
+      setShowGoalSetting(false);
+      playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleAddMoney();
@@ -102,8 +112,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 transition-all duration-500">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Header Controls */}
+      <div className="fixed top-4 right-4 z-50 flex space-x-3">
+        <Button
+          onClick={() => setShowGoalSetting(true)}
+          className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
+          size="icon"
+        >
+          <Settings className="h-5 w-5 text-gray-700 dark:text-gray-300 group-hover:rotate-12 transition-transform duration-300" />
+        </Button>
         <Button
           onClick={handleThemeToggle}
           className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
@@ -380,6 +397,55 @@ export default function Home() {
           </Card>
         </div>
       </div>
+
+      {/* Goal Setting Modal */}
+      {showGoalSetting && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="glass-card rounded-3xl shadow-2xl border-white/20 w-full max-w-md">
+            <CardContent className="p-6">
+              <div className="flex items-center mb-4">
+                <Target className="text-[var(--emerald-custom)] mr-3" />
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Set Savings Goal</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    New Goal Amount
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 dark:text-gray-400 text-lg">₹</span>
+                    </div>
+                    <Input
+                      type="number"
+                      value={newGoal}
+                      onChange={(e) => setNewGoal(e.target.value)}
+                      placeholder="Enter goal amount"
+                      className="w-full pl-8 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-white/30 dark:border-gray-600/30 rounded-2xl focus:ring-2 focus:ring-[var(--emerald-custom)] focus:border-transparent outline-none text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex space-x-3 pt-4">
+                  <Button
+                    onClick={() => setShowGoalSetting(false)}
+                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-2xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleGoalUpdate}
+                    className="flex-1 bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] text-white py-3 px-6 rounded-2xl font-semibold hover:from-[var(--emerald-dark)] hover:to-[var(--emerald-custom)] transition-all duration-300"
+                  >
+                    Update Goal
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
