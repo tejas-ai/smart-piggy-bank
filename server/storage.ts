@@ -10,24 +10,39 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getSavingsEntries(): Promise<SavingsEntry[]> {
-    const entries = await db.select().from(savingsEntries).orderBy(desc(savingsEntries.timestamp));
-    return entries;
+    try {
+      const entries = await db.select().from(savingsEntries).orderBy(desc(savingsEntries.timestamp));
+      return entries;
+    } catch (error) {
+      console.error('Failed to fetch savings entries:', error);
+      throw new Error('Database connection failed');
+    }
   }
 
   async createSavingsEntry(insertEntry: InsertSavingsEntry): Promise<SavingsEntry> {
-    const [entry] = await db
-      .insert(savingsEntries)
-      .values(insertEntry)
-      .returning();
-    return entry;
+    try {
+      const [entry] = await db
+        .insert(savingsEntries)
+        .values(insertEntry)
+        .returning();
+      return entry;
+    } catch (error) {
+      console.error('Failed to create savings entry:', error);
+      throw new Error('Database operation failed');
+    }
   }
 
   async deleteSavingsEntry(id: number): Promise<boolean> {
-    const result = await db
-      .delete(savingsEntries)
-      .where(eq(savingsEntries.id, id))
-      .returning();
-    return result.length > 0;
+    try {
+      const result = await db
+        .delete(savingsEntries)
+        .where(eq(savingsEntries.id, id))
+        .returning();
+      return result.length > 0;
+    } catch (error) {
+      console.error('Failed to delete savings entry:', error);
+      throw new Error('Database operation failed');
+    }
   }
 }
 

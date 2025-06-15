@@ -18,10 +18,11 @@ const quotes = [
 ];
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
-  const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
   const [inputAmount, setInputAmount] = useState("");
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
+  
+  const { theme, toggleTheme } = useTheme();
+  const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
 
   const handleAddMoney = async () => {
     const amount = parseInt(inputAmount);
