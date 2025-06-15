@@ -19,22 +19,24 @@ const quotes = [
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
-  const { savedAmount, history, stats, goal, addAmount, deleteEntry } = useSavings();
+  const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
   const [inputAmount, setInputAmount] = useState("");
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
 
-  const handleAddMoney = () => {
+  const handleAddMoney = async () => {
     const amount = parseInt(inputAmount);
     if (amount && amount > 0) {
-      if (addAmount(amount)) {
+      const success = await addAmount(amount);
+      if (success) {
         setInputAmount("");
         playSound("https://www.soundjay.com/misc/sounds/coin-drop-2.mp3");
       }
     }
   };
 
-  const handleDeleteEntry = (id: number) => {
-    if (deleteEntry(id)) {
+  const handleDeleteEntry = async (id: number) => {
+    const success = await deleteEntry(id);
+    if (success) {
       playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
     }
   };

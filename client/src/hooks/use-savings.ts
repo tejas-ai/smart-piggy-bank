@@ -1,11 +1,6 @@
-import { useState, useEffect } from "react";
-
-export interface SavingsEntry {
-  id: number;
-  amount: number;
-  timestamp: string;
-  date: Date;
-}
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { type SavingsEntry, type InsertSavingsEntry } from "@shared/schema";
 
 export interface SavingsStats {
   totalEntries: number;
@@ -15,69 +10,67 @@ export interface SavingsStats {
 }
 
 const GOAL = 100000;
-const STORAGE_KEY_AMOUNT = "savedAmount";
-const STORAGE_KEY_HISTORY = "savingsHistory";
 
 export function useSavings() {
-  const [savedAmount, setSavedAmount] = useState<number>(() => {
-    return parseInt(localStorage.getItem(STORAGE_KEY_AMOUNT) || "0");
+  // Fetch savings entries from the database
+  const { data: entries = [], isLoading } = useQuery({
+    queryKey: ["/api/savings"],
   });
 
-  const [history, setHistory] = useState<SavingsEntry[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY_HISTORY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        return parsed.map((entry: any) => ({
-          ...entry,
-          date: new Date(entry.date),
-        }));
-      } catch {
-        return [];
-      }
-    }
-    return [];
+  // Create new savings entry
+  const createEntryMutation = useMutation({
+    mutationFn: (data: InsertSavingsEntry) => 
+      apiRequest<SavingsEntry>("/api/savings", { method: "POST", body: data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/savings"] });
+    },
   });
 
-  // Update localStorage when state changes
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_AMOUNT, savedAmount.toString());
-  }, [savedAmount]);
+  // Delete savings entry
+  const deleteEntryMutation = useMutation({
+    mutationFn: (id: number) => 
+      apiRequest(`/api/savings/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/savings"] });
+    },
+  });
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
-  }, [history]);
-
-  const addAmount = (amount: number) => {
+  const addAmount = async (amount: number) => {
     if (amount <= 0) return false;
-
-    const newEntry: SavingsEntry = {
-      id: Date.now(),
-      amount,
-      timestamp: new Date().toLocaleString(),
-      date: new Date(),
-    };
-
-    setSavedAmount(prev => prev + amount);
-    setHistory(prev => [newEntry, ...prev]);
-    return true;
+    
+    try {
+      await createEntryMutation.mutateAsync({ amount });
+      return true;
+    } catch {
+      return false;
+    }
   };
 
-  const deleteEntry = (id: number) => {
-    const entry = history.find(h => h.id === id);
-    if (!entry) return false;
-
-    setSavedAmount(prev => prev - entry.amount);
-    setHistory(prev => prev.filter(h => h.id !== id));
-    return true;
+  const deleteEntry = async (id: number) => {
+    try {
+      await deleteEntryMutation.mutateAsync(id);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
+  // Calculate stats from entries
+  const savedAmount = entries.reduce((sum, entry) => sum + entry.amount, 0);
+  
   const stats: SavingsStats = {
-    totalEntries: history.length,
-    averageEntry: history.length > 0 ? Math.round(savedAmount / history.length) : 0,
+    totalEntries: entries.length,
+    averageEntry: entries.length > 0 ? Math.round(savedAmount / entries.length) : 0,
     savedAmount,
     progress: Math.min((savedAmount / GOAL) * 100, 100),
   };
+
+  // Convert database timestamps to display format
+  const history = entries.map(entry => ({
+    ...entry,
+    timestamp: new Date(entry.timestamp).toLocaleString(),
+    date: new Date(entry.timestamp),
+  }));
 
   return {
     savedAmount,
@@ -86,5 +79,8 @@ export function useSavings() {
     goal: GOAL,
     addAmount,
     deleteEntry,
+    isLoading,
+    isCreating: createEntryMutation.isPending,
+    isDeleting: deleteEntryMutation.isPending,
   };
 }
