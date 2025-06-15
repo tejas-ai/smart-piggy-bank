@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Piggy Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-light: linear-gradient(to right, #f9f9f9, #e0f7fa);
+      --bg-dark: linear-gradient(to right, #0a0a0a, #121212);
+      --text-light: #111;
+      --text-dark: #f1f1f1;
+      --accent: #00cc88;
+      --glass: rgba(255, 255, 255, 0.2);
+      --ring-base: #555;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Rubik', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      transition: background 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      margin: 1.5rem 0;
+      width: 90%;
+      max-width: 450px;
+    }
+
+    .progress-ring {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) 0%, var(--ring-base) 0%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      font-weight: bold;
+      margin: 1rem auto;
+      transition: background 0.5s ease;
+    }
+
+    .toggle-btn {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00cc88, #009966);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-icon {
+      font-size: 1.2rem;
+    }
+
+    input[type="number"] {
+      padding: 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid #ccc;
+      width: 100%;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      background: #fff;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      font-weight: 600;
+    }
+
+    ul { padding-left: 0; }
+    li { margin-bottom: 0.75rem; list-style: none; }
+
+    .dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .dark-mode input[type="number"] {
+      background: #222;
+      color: #fff;
+      border-color: #444;
+    }
+
+    .dark-mode .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .quote-box {
+      font-style: italic;
+      text-align: center;
+      margin-top: 1rem;
+      opacity: 0.9;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 0.8rem;
+      padding: 1rem;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #cc0000;
+      transition: transform 0.2s ease;
+    }
+
+    .delete-btn:hover {
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-btn" onclick="toggleMode()">
+    <span class="toggle-icon" id="toggleIcon">🌙</span>
+    <span id="toggleText">Prefer Dark Mode?</span>
+  </button>
+
+  <div class="glass-card">
+    <h2 style="text-align: center;">💰 Smart Piggy Bank</h2>
+    <input type="number" id="amount" placeholder="Enter Amount (₹)">
+    <button onclick="addAmount()">+ Add to Piggy Bank</button>
+  </div>
+
+  <div class="glass-card">
+    <div class="progress-ring" id="ring">0%</div>
+    <p style="text-align:center; font-size: 1.1rem; font-weight: 500;">Saved So Far: ₹<span id="saved">0</span> / ₹100000</p>
+    <div class="quote-box" id="quoteBox"></div>
+  </div>
+
+  <div class="glass-card" style="max-height: 300px; overflow-y: auto;">
+    <h3 style="text-align:center;">📜 History Log</h3>
+    <ul id="historyList"></ul>
+  </div>
+
+  <audio id="toggleSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_a8d24a6f47.mp3"></audio>
+  <audio id="addSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_54cae3db34.mp3"></audio>
+
+  <script>
+    const savedDisplay = document.getElementById("saved");
+    const ring = document.getElementById("ring");
+    const historyList = document.getElementById("historyList");
+    const quoteBox = document.getElementById("quoteBox");
+    const toggleIcon = document.getElementById("toggleIcon");
+    const toggleText = document.getElementById("toggleText");
+    const toggleSound = document.getElementById("toggleSound");
+    const addSound = document.getElementById("addSound");
+    const goal = 100000;
+
+    const quotes = [
+      { text: "Do something today that your future self will thank you for.", author: "Sean Patrick Flanery" },
+      { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+      { text: "It always seems impossible until it’s done.", author: "Nelson Mandela" },
+      { text: "Success is the sum of small efforts repeated day in and day out.", author: "Robert Collier" },
+      { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" }
+    ];
+
+    let total = parseInt(localStorage.getItem("savedAmount")) || 0;
+    let history = JSON.parse(localStorage.getItem("moneyHistory")) || [];
+
+    function loadRandomQuote() {
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteBox.innerHTML = `“${quote.text}”<br><strong>- ${quote.author}</strong>`;
+    }
+
+    loadRandomQuote();
+    updateUI();
+    renderHistory();
+
+    function toggleMode() {
+      const isDark = document.body.classList.toggle("dark-mode");
+      toggleIcon.textContent = isDark ? "☀️" : "🌙";
+      toggleText.textContent = isDark ? "Prefer Light Mode?" : "Prefer Dark Mode?";
+      toggleSound.currentTime = 0;
+      toggleSound.play();
+    }
+
+    function addAmount() {
+      const input = document.getElementById("amount");
+      const value = parseInt(input.value);
+      if (!isNaN(value) && value > 0) {
+        total += value;
+        const now = new Date();
+        const entry = { amount: value, timestamp: now.toLocaleString() };
+        history.unshift(entry);
+        localStorage.setItem("savedAmount", total);
+        localStorage.setItem("moneyHistory", JSON.stringify(history));
+        input.value = "";
+        updateUI();
+        renderHistory();
+        addSound.currentTime = 0;
+        addSound.play();
+      }
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+      if (history.length === 0) {
+        historyList.innerHTML = '<li style="opacity: 0.6;">No history yet.</li>';
+      } else {
+        history.forEach((entry, index) => {
+          const li = document.createElement("li");
+          li.style.display = "flex";
+          li.style.justifyContent = "space-between";
+          li.style.alignItems = "center";
+
+          const text = document.createElement("span");
+          text.innerHTML = `<strong>₹${entry.amount}</strong> on <em>${entry.timestamp}</em>`;
+
+          const delBtn = document.createElement("button");
+          delBtn.innerHTML = "🗑";
+          delBtn.className = "delete-btn";
+          delBtn.title = "Delete entry";
+
+          delBtn.onclick = () => {
+            total -= entry.amount;
+            history.splice(index, 1);
+            localStorage.setItem("savedAmount", total);
+            localStorage.setItem("moneyHistory", JSON.stringify(history));
+            updateUI();
+            renderHistory();
+          };
+
+          li.appendChild(text);
+          li.appendChild(delBtn);
+          historyList.appendChild(li);
+        });
+      }
+    }
+
+    function updateUI() {
+      const percent = Math.min((total / goal) * 100, 100);
+      savedDisplay.textContent = total;
+      ring.style.background = `conic-gradient(var(--accent) ${percent}%, var(--ring-base) ${percent}%)`;
+      ring.textContent = `${Math.floor(percent)}%`;
+    }
+  </script>
+</body>
+</html>
