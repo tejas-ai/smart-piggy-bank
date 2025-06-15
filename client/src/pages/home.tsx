@@ -235,6 +235,20 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Credit Footer */}
+        <div className="mt-6 text-center">
+          <Card className="glass-card rounded-2xl border-white/20">
+            <CardContent className="p-4">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Created by
+              </div>
+              <div className="text-base font-semibold text-[var(--emerald-custom)] mt-1">
+                Mr Tejas.J.Handigol
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
