@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { PiggyBank, Plus, History, Trash2, Moon, Sun, Coins } from "lucide-react";
+import { useState, useEffect } from "react";
+import { PiggyBank, Plus, History, Trash2, Moon, Sun, Coins, Trophy, Target, Settings, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,9 +20,56 @@ const quotes = [
 export default function Home() {
   const [inputAmount, setInputAmount] = useState("");
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
+  const [showGoalSetting, setShowGoalSetting] = useState(false);
+  const [newGoal, setNewGoal] = useState("100000");
   
   const { theme, toggleTheme } = useTheme();
   const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
+
+  useEffect(() => {
+    setNewGoal(goal.toString());
+  }, [goal]);
+
+  // Achievement system
+  const achievements = [
+    {
+      id: "first_save",
+      title: "First Steps! 🎉",
+      description: "Made your first savings entry",
+      unlocked: stats.totalEntries >= 1,
+      icon: "🏅"
+    },
+    {
+      id: "milestone_1k",
+      title: "₹1K Milestone! 💰",
+      description: "Saved your first ₹1,000",
+      unlocked: savedAmount >= 1000,
+      icon: "💎"
+    },
+    {
+      id: "consistent_saver",
+      title: "Consistent Saver! 🔥",
+      description: "Made 5 savings entries",
+      unlocked: stats.totalEntries >= 5,
+      icon: "⚡"
+    },
+    {
+      id: "halfway_hero",
+      title: "Halfway Hero! 🚀",
+      description: "Reached 50% of your goal",
+      unlocked: stats.progress >= 50,
+      icon: "🎯"
+    },
+    {
+      id: "goal_crusher",
+      title: "Goal Crusher! 👑",
+      description: "Achieved your savings goal",
+      unlocked: stats.progress >= 100,
+      icon: "👑"
+    }
+  ];
+
+  const unlockedAchievements = achievements.filter(a => a.unlocked);
 
   const handleAddMoney = async () => {
     const amount = parseInt(inputAmount);
@@ -73,10 +120,12 @@ export default function Home() {
       <div className="container mx-auto px-4 py-8 max-w-md">
         {/* Header */}
         <div className="text-center mb-8 animate-float">
-          <div className="inline-block p-4 rounded-3xl glass-card mb-4">
-            <PiggyBank className="w-10 h-10 text-[var(--emerald-custom)]" />
+          <div className="inline-block p-4 rounded-3xl glass-card mb-4 dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+            <PiggyBank className="w-10 h-10 text-[var(--emerald-custom)] dark:drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Smart Piggy Bank</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+            Smart Piggy Bank
+          </h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm">Your journey to {formatCurrency(goal)} starts here</p>
         </div>
 
@@ -116,37 +165,104 @@ export default function Home() {
         <Card className="glass-card rounded-3xl shadow-xl mb-6 text-center border-white/20">
           <CardContent className="p-6">
             <div className="relative inline-block mb-4">
-              <div 
-                className="progress-ring w-40 h-40 rounded-full flex items-center justify-center relative overflow-hidden"
-                style={{ "--progress": `${stats.progress}%` } as React.CSSProperties}
-              >
-                <div className="absolute inset-2 bg-white/20 dark:bg-gray-800/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{Math.floor(stats.progress)}%</div>
-                    <div className="text-xs text-white/80">completed</div>
+              <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
+                {/* Background circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  fill="none"
+                  className="text-gray-200 dark:text-gray-700"
+                />
+                {/* Progress circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  stroke="url(#progressGradient)"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 45}`}
+                  strokeDashoffset={`${2 * Math.PI * 45 * (1 - stats.progress / 100)}`}
+                  className="transition-all duration-1000 ease-out drop-shadow-lg dark:drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  strokeLinecap="round"
+                />
+                <defs>
+                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="var(--emerald-custom)" />
+                    <stop offset="100%" stopColor="var(--emerald-light)" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                    {Math.floor(stats.progress)}%
                   </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-300">completed</div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Enhanced progress label */}
+            <div className="mb-4 p-3 bg-white/30 dark:bg-gray-800/30 rounded-2xl">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {formatCurrency(savedAmount)} saved / {formatCurrency(goal)} goal
               </div>
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Saved</span>
+                <span className="text-gray-600 dark:text-gray-400">Current Savings</span>
                 <span className="font-semibold text-gray-800 dark:text-white">{formatCurrency(savedAmount)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Goal</span>
+                <span className="text-gray-600 dark:text-gray-400">Target Goal</span>
                 <span className="font-semibold text-[var(--emerald-custom)]">{formatCurrency(goal)}</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-3">
-                <div 
-                  className="bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] h-2 rounded-full transition-all duration-1000 ease-out"
-                  style={{ width: `${stats.progress}%` }}
-                />
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-600 dark:text-gray-400">Remaining</span>
+                <span className="font-semibold text-orange-500">{formatCurrency(Math.max(0, goal - savedAmount))}</span>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Achievements Section */}
+        {unlockedAchievements.length > 0 && (
+          <Card className="glass-card rounded-3xl shadow-xl mb-6 border-white/20">
+            <CardContent className="p-6">
+              <div className="flex items-center mb-4">
+                <Trophy className="text-yellow-500 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Achievements</h3>
+                <span className="ml-auto text-sm bg-yellow-100 dark:bg-yellow-800 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">
+                  {unlockedAchievements.length}/{achievements.length}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {unlockedAchievements.map((achievement) => (
+                  <div
+                    key={achievement.id}
+                    className="flex items-center p-3 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 rounded-xl border border-yellow-200 dark:border-yellow-700"
+                  >
+                    <div className="text-2xl mr-3">{achievement.icon}</div>
+                    <div>
+                      <div className="font-semibold text-gray-800 dark:text-white text-sm">
+                        {achievement.title}
+                      </div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">
+                        {achievement.description}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Motivational Quote */}
         <Card className="glass-card rounded-3xl shadow-xl mb-6 border-white/20">
@@ -186,33 +302,44 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {history.map((entry: any) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-center justify-between p-3 bg-white/30 dark:bg-gray-800/30 rounded-xl group hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-300"
-                    >
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-[var(--emerald-custom)]/20 rounded-full flex items-center justify-center mr-3">
-                          <Coins className="text-[var(--emerald-custom)] text-sm" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-800 dark:text-white">
-                            {formatCurrency(entry.amount)}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {entry.timestamp}
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => handleDeleteEntry(entry.id)}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300 bg-transparent border-none"
-                        size="icon"
+                  {history.map((entry: any, index: number) => {
+                    const entryIcon = entry.amount >= 5000 ? "💰" : entry.amount >= 1000 ? "💸" : "🪙";
+                    const isRecent = index < 3;
+                    
+                    return (
+                      <div
+                        key={entry.id}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-xl group transition-all duration-300",
+                          isRecent 
+                            ? "bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200 dark:border-emerald-700"
+                            : "bg-white/30 dark:bg-gray-800/30 hover:bg-white/40 dark:hover:bg-gray-700/40"
+                        )}
                       >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                        <div className="flex items-center">
+                          <div className="w-12 h-12 bg-gradient-to-br from-[var(--emerald-custom)] to-[var(--emerald-light)] rounded-full flex items-center justify-center mr-3 text-white shadow-lg">
+                            <span className="text-lg">{entryIcon}</span>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-800 dark:text-white flex items-center">
+                              {formatCurrency(entry.amount)}
+                              {isRecent && <span className="ml-2 text-xs bg-emerald-100 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full">New</span>}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {entry.timestamp}
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          className="opacity-0 group-hover:opacity-100 p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-300 bg-transparent border-none"
+                          size="icon"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
