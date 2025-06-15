@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { PiggyBank, Plus, History, Trash2, Moon, Sun, Coins } from "lucide-react";
+import { PiggyBank, Plus, History, Trash2, Moon, Sun, Coins, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTheme } from "@/components/theme-provider";
 import { useSavings } from "@/hooks/use-savings";
+import { useAuth } from "@/hooks/use-auth";
 import { cn, playSound, formatCurrency, formatNumber } from "@/lib/utils";
 
 const quotes = [
@@ -22,6 +23,7 @@ export default function Home() {
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
   
   const { theme, toggleTheme } = useTheme();
+  const { logout } = useAuth();
   const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
 
   const handleAddMoney = async () => {
@@ -47,6 +49,11 @@ export default function Home() {
     playSound("https://www.soundjay.com/misc/sounds/button-4.mp3");
   };
 
+  const handleLogout = () => {
+    logout();
+    playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleAddMoney();
@@ -55,8 +62,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 transition-all duration-500">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Header Controls */}
+      <div className="fixed top-4 right-4 z-50 flex space-x-3">
+        <Button
+          onClick={handleLogout}
+          className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
+          size="icon"
+        >
+          <LogOut className="h-5 w-5 text-gray-700 dark:text-gray-300 group-hover:scale-110 transition-transform duration-300" />
+        </Button>
         <Button
           onClick={handleThemeToggle}
           className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
