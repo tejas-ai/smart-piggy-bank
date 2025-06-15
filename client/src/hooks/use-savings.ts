@@ -55,18 +55,21 @@ export function useSavings() {
     }
   };
 
+  // Type guard to ensure entries is an array
+  const entriesArray: SavingsEntry[] = Array.isArray(entries) ? entries : [];
+  
   // Calculate stats from entries
-  const savedAmount = entries.reduce((sum, entry) => sum + entry.amount, 0);
+  const savedAmount = entriesArray.reduce((sum: number, entry: SavingsEntry) => sum + entry.amount, 0);
   
   const stats: SavingsStats = {
-    totalEntries: entries.length,
-    averageEntry: entries.length > 0 ? Math.round(savedAmount / entries.length) : 0,
+    totalEntries: entriesArray.length,
+    averageEntry: entriesArray.length > 0 ? Math.round(savedAmount / entriesArray.length) : 0,
     savedAmount,
     progress: Math.min((savedAmount / GOAL) * 100, 100),
   };
 
   // Convert database timestamps to display format
-  const history = entries.map(entry => ({
+  const history = entriesArray.map((entry: SavingsEntry) => ({
     ...entry,
     timestamp: new Date(entry.timestamp).toLocaleString(),
     date: new Date(entry.timestamp),

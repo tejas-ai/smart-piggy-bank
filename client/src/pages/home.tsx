@@ -185,7 +185,7 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {history.map((entry) => (
+                  {history.map((entry: any) => (
                     <div
                       key={entry.id}
                       className="flex items-center justify-between p-3 bg-white/30 dark:bg-gray-800/30 rounded-xl group hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all duration-300"
