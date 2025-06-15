@@ -384,14 +384,17 @@ export default function Home() {
         </div>
 
         {/* Credit Footer */}
-        <div className="mt-6 text-center">
-          <Card className="glass-card rounded-2xl border-white/20">
-            <CardContent className="p-4">
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Created by
-              </div>
-              <div className="text-base font-semibold text-[var(--emerald-custom)] mt-1">
-                Mr Tejas.J.Handigol
+        <div className="mt-8 text-center">
+          <Card className="glass-card rounded-3xl border-white/20 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center space-y-3">
+                <div className="text-3xl mb-2">👑</div>
+                <div className="text-lg font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                  Designed & Developed by Tejas J. Handigol
+                </div>
+                <div className="text-sm italic text-gray-600 dark:text-gray-300">
+                  Crafted with precision for future millionaires.
+                </div>
               </div>
             </CardContent>
           </Card>
