@@ -110,6 +110,11 @@ The Smart Piggy Bank is a full-stack web application designed to help users trac
 - Refined celebration animations to clean toast notifications with subtle sparkles
 - Removed background coin sounds to focus on milestone achievements only
 - Enhanced audio clarity and volume for better user experience
+- Expanded gamification to 7 piggy skins and 7 room themes with achievement-based unlocking
+- Fixed financial literacy tips to display properly every 3rd save when enabled
+- Enhanced theme system with proper light/dark mode variants for all 7 room themes
+- Dynamic accent color system that adapts UI elements to match selected theme
+- Improved visual consistency across all theme variations
 
 ## Key Features Implemented
 - Savings entry system with amount input and history tracking

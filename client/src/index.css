@@ -28,6 +28,11 @@
   
   /* Custom colors for piggy bank app */
   --emerald-custom: hsl(153, 100%, 40%);
+  
+  /* Dynamic theme accent colors - updated via JavaScript */
+  --theme-accent: 16 185 129;
+  --theme-accent-light: 52 211 153;
+  --theme-accent-dark: 5 150 105;
   --emerald-dark: hsl(153, 100%, 30%);
   --emerald-light: hsl(153, 100%, 50%);
   --glass-light: hsla(0, 0%, 100%, 0.15);

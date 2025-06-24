@@ -31,14 +31,70 @@ const financialTips = [
 ];
 
 const piggyThemes = {
-  default: { name: "Classic", bgGradient: "from-blue-400 to-purple-600", unlocked: true, percentage: 0 },
-  ocean: { name: "Ocean Breeze", bgGradient: "from-cyan-400 to-blue-500", unlocked: false, percentage: 15 },
-  sunset: { name: "Golden Sunset", bgGradient: "from-orange-400 to-red-500", unlocked: false, percentage: 30 },
-  forest: { name: "Forest Green", bgGradient: "from-green-400 to-emerald-600", unlocked: false, percentage: 45 },
-  royal: { name: "Royal Purple", bgGradient: "from-purple-500 to-indigo-600", unlocked: false, percentage: 60 },
-  cosmic: { name: "Cosmic Space", bgGradient: "from-indigo-600 to-purple-800", unlocked: false, percentage: 75 },
-  fire: { name: "Fire Ember", bgGradient: "from-red-500 to-orange-600", unlocked: false, percentage: 90 },
-  diamond: { name: "Diamond Elite", bgGradient: "from-gray-300 to-blue-200", unlocked: false, percentage: 100 }
+  default: { 
+    name: "Classic", 
+    light: "from-blue-50 via-indigo-50 to-purple-50", 
+    dark: "from-gray-900 via-blue-900 to-indigo-900",
+    accent: "bg-blue-500",
+    unlocked: true, 
+    percentage: 0 
+  },
+  ocean: { 
+    name: "Ocean Breeze", 
+    light: "from-cyan-50 via-blue-50 to-teal-50", 
+    dark: "from-slate-900 via-cyan-900 to-blue-900",
+    accent: "bg-cyan-500",
+    unlocked: false, 
+    percentage: 15 
+  },
+  sunset: { 
+    name: "Golden Sunset", 
+    light: "from-orange-50 via-amber-50 to-yellow-50", 
+    dark: "from-gray-900 via-orange-900 to-red-900",
+    accent: "bg-orange-500",
+    unlocked: false, 
+    percentage: 30 
+  },
+  forest: { 
+    name: "Forest Green", 
+    light: "from-green-50 via-emerald-50 to-teal-50", 
+    dark: "from-gray-900 via-green-900 to-emerald-900",
+    accent: "bg-emerald-500",
+    unlocked: false, 
+    percentage: 45 
+  },
+  royal: { 
+    name: "Royal Purple", 
+    light: "from-purple-50 via-violet-50 to-indigo-50", 
+    dark: "from-gray-900 via-purple-900 to-indigo-900",
+    accent: "bg-purple-500",
+    unlocked: false, 
+    percentage: 60 
+  },
+  cosmic: { 
+    name: "Cosmic Space", 
+    light: "from-indigo-50 via-purple-50 to-pink-50", 
+    dark: "from-black via-indigo-900 to-purple-900",
+    accent: "bg-indigo-500",
+    unlocked: false, 
+    percentage: 75 
+  },
+  fire: { 
+    name: "Fire Ember", 
+    light: "from-red-50 via-orange-50 to-pink-50", 
+    dark: "from-gray-900 via-red-900 to-orange-900",
+    accent: "bg-red-500",
+    unlocked: false, 
+    percentage: 90 
+  },
+  diamond: { 
+    name: "Diamond Elite", 
+    light: "from-gray-50 via-slate-50 to-blue-50", 
+    dark: "from-slate-900 via-gray-800 to-slate-900",
+    accent: "bg-slate-500",
+    unlocked: false, 
+    percentage: 100 
+  }
 };
 
 const piggySkins = {
@@ -336,8 +392,31 @@ export default function Home() {
     }
   };
 
+  const currentTheme = unlockedThemes[selectedTheme] || unlockedThemes.default;
+  const backgroundClass = theme === 'dark' ? currentTheme.dark : currentTheme.light;
+
+  // Update CSS custom properties for theme accent colors
+  useEffect(() => {
+    const themeAccentMap = {
+      default: { primary: '59 130 246', light: '96 165 250', dark: '37 99 235' }, // blue
+      ocean: { primary: '6 182 212', light: '34 211 238', dark: '8 145 178' }, // cyan
+      sunset: { primary: '249 115 22', light: '251 146 60', dark: '194 65 12' }, // orange
+      forest: { primary: '16 185 129', light: '52 211 153', dark: '5 150 105' }, // emerald
+      royal: { primary: '168 85 247', light: '196 181 253', dark: '126 34 206' }, // purple
+      cosmic: { primary: '99 102 241', light: '129 140 248', dark: '67 56 202' }, // indigo
+      fire: { primary: '239 68 68', light: '248 113 113', dark: '185 28 28' }, // red
+      diamond: { primary: '100 116 139', light: '148 163 184', dark: '71 85 105' } // slate
+    };
+    
+    const colors = themeAccentMap[selectedTheme as keyof typeof themeAccentMap] || themeAccentMap.default;
+    
+    document.documentElement.style.setProperty('--theme-accent', colors.primary);
+    document.documentElement.style.setProperty('--theme-accent-light', colors.light);
+    document.documentElement.style.setProperty('--theme-accent-dark', colors.dark);
+  }, [selectedTheme]);
+
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${unlockedThemes[selectedTheme]?.unlocked ? unlockedThemes[selectedTheme].bgGradient : 'from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900'} transition-all duration-500`}>
+    <div className={`min-h-screen bg-gradient-to-br ${backgroundClass} transition-all duration-500`}>
       {/* Header Controls */}
       <div className="fixed top-4 right-4 z-50 flex space-x-3">
         <Button
@@ -397,13 +476,13 @@ export default function Home() {
                 onChange={(e) => setInputAmount(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter amount"
-                className="w-full pl-8 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-white/30 dark:border-gray-600/30 rounded-2xl focus:ring-2 focus:ring-[var(--emerald-custom)] focus:border-transparent outline-none text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
+                className="w-full pl-8 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-white/30 dark:border-gray-600/30 rounded-2xl focus:ring-2 focus:ring-[rgb(var(--theme-accent))] focus:border-transparent outline-none text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300"
               />
             </div>
             
             <Button 
               onClick={handleAddMoney}
-              className="w-full bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] text-white py-3 px-6 rounded-2xl font-semibold hover:from-[var(--emerald-dark)] hover:to-[var(--emerald-custom)] transform hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="w-full bg-gradient-to-r from-[rgb(var(--theme-accent))] to-[rgb(var(--theme-accent-light))] text-white py-3 px-6 rounded-2xl font-semibold hover:from-[rgb(var(--theme-accent-dark))] hover:to-[rgb(var(--theme-accent))] transform hover:scale-105 active:scale-95 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <Plus className="mr-2 h-4 w-4" />
               Add to Piggy Bank
@@ -441,8 +520,8 @@ export default function Home() {
                 />
                 <defs>
                   <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="var(--emerald-custom)" />
-                    <stop offset="100%" stopColor="var(--emerald-light)" />
+                    <stop offset="0%" stopColor={`rgb(var(--theme-accent))`} />
+                    <stop offset="100%" stopColor={`rgb(var(--theme-accent-light))`} />
                   </linearGradient>
                 </defs>
               </svg>
@@ -798,7 +877,7 @@ export default function Home() {
                     onClick={() => setTipsEnabled(!tipsEnabled)}
                     className={`px-4 py-2 rounded-xl transition-all duration-300 ${
                       tipsEnabled 
-                        ? 'bg-[var(--emerald-custom)] text-white' 
+                        ? 'bg-[rgb(var(--theme-accent))] text-white' 
                         : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
                     }`}
                   >
@@ -817,9 +896,9 @@ export default function Home() {
                       onClick={() => skin.unlocked && setSelectedPiggySkin(key)}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
                         selectedPiggySkin === key
-                          ? 'border-[var(--emerald-custom)] bg-[var(--emerald-custom)]/10'
+                          ? 'border-[rgb(var(--theme-accent))] bg-[rgb(var(--theme-accent))]/10'
                           : skin.unlocked
-                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[var(--emerald-custom)]/50'
+                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[rgb(var(--theme-accent))]/50'
                           : 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 opacity-50 cursor-not-allowed'
                       }`}
                     >
@@ -847,13 +926,16 @@ export default function Home() {
                       onClick={() => theme.unlocked && setSelectedTheme(key)}
                       className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
                         selectedTheme === key
-                          ? 'border-[var(--emerald-custom)] bg-[var(--emerald-custom)]/10'
+                          ? 'border-[rgb(var(--theme-accent))] bg-[rgb(var(--theme-accent))]/10'
                           : theme.unlocked
-                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[var(--emerald-custom)]/50'
+                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[rgb(var(--theme-accent))]/50'
                           : 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 opacity-50 cursor-not-allowed'
                       }`}
                     >
-                      <div className={`h-12 rounded-xl bg-gradient-to-r ${theme.bgGradient} mb-3`}></div>
+                      <div className="mb-3 space-y-1">
+                        <div className={`h-6 rounded-lg bg-gradient-to-r ${theme.light}`}></div>
+                        <div className={`h-6 rounded-lg bg-gradient-to-r ${theme.dark}`}></div>
+                      </div>
                       <div className="text-sm font-medium text-gray-800 dark:text-white">{theme.name}</div>
                       {!theme.unlocked && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -872,7 +954,7 @@ export default function Home() {
       {/* Financial Tip Toast */}
       {showFinancialTip && (
         <div className="fixed top-20 left-1/2 transform -translate-x-1/2 pointer-events-none z-[100] animate-in slide-in-from-top duration-500">
-          <Card className="glass-card rounded-2xl border-white/30 shadow-xl dark:shadow-[0_0_20px_rgba(16,185,129,0.3)] backdrop-blur-lg max-w-md">
+          <Card className={`glass-card rounded-2xl border-white/30 shadow-xl dark:shadow-[0_0_20px_rgb(var(--theme-accent)/0.3)] backdrop-blur-lg max-w-md`}>
             <CardContent className="p-4">
               <div className="flex items-start space-x-3">
                 <div className="text-2xl">💡</div>
