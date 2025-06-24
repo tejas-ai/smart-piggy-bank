@@ -41,20 +41,20 @@ export default function Home() {
     // Check for milestone crossings
     const milestones = [25, 50, 75, 100];
     const milestoneSounds = {
-      25: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
-      50: "https://www.soundjay.com/misc/sounds/magic-chime-02.mp3", 
-      75: "https://www.soundjay.com/misc/sounds/coin-drop-2.mp3",
-      100: "https://www.soundjay.com/misc/sounds/magic-chime-03.mp3"
+      25: "https://www.soundjay.com/misc/sounds/ding-idea-40142.mp3", // Sparkle/Ding
+      50: "https://www.soundjay.com/misc/sounds/whoosh-6316.mp3", // Whoosh Rise
+      75: "https://www.soundjay.com/misc/sounds/drumroll-please-99704.mp3", // Drumroll Reveal
+      100: "https://www.soundjay.com/misc/sounds/royal-fanfare-trumpet-16149.mp3" // Royal Indian Fanfare
     };
 
     milestones.forEach(milestone => {
       if (previousProgress < milestone && currentProgress >= milestone) {
         // Milestone reached! Play celebration sound and show animation
         const celebrationMessages = {
-          25: "🎉 Quarter Way There! 🎉",
-          50: "🔥 Halfway Champion! 🔥", 
-          75: "⚡ Almost There! ⚡",
-          100: "👑 GOAL ACHIEVED! 👑"
+          25: "✨ Great Start! ✨",
+          50: "🚀 Halfway Hero! 🚀", 
+          75: "🥁 Almost There! 🥁",
+          100: "🎺 Royal Victory! 🎺"
         };
 
         setCelebrationMessage(celebrationMessages[milestone]);
