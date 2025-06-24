@@ -404,44 +404,70 @@ export default function Home() {
       {/* Goal Setting Modal */}
       {showGoalSetting && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <Card className="glass-card rounded-3xl shadow-2xl border-white/20 w-full max-w-md">
-            <CardContent className="p-6">
-              <div className="flex items-center mb-4">
-                <Target className="text-[var(--emerald-custom)] mr-3" />
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">Set Savings Goal</h3>
+          <Card className="glass-card rounded-3xl shadow-2xl border-white/20 w-full max-w-md transform animate-in fade-in zoom-in duration-300">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-[var(--emerald-custom)] to-[var(--emerald-light)] rounded-full flex items-center justify-center shadow-lg dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                  <Target className="text-white text-2xl" />
+                </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)] mb-2">
+                  Set Your Savings Goal
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Choose an amount that motivates you to save consistently
+                </p>
+              </div>
+              
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    New Goal Amount
+                  <label className="block text-base font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    Target Amount
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 dark:text-gray-400 text-lg">₹</span>
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <span className="text-gray-500 dark:text-gray-400 text-xl font-semibold">₹</span>
                     </div>
                     <Input
                       type="number"
                       value={newGoal}
                       onChange={(e) => setNewGoal(e.target.value)}
-                      placeholder="Enter goal amount"
-                      className="w-full pl-8 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-white/30 dark:border-gray-600/30 rounded-2xl focus:ring-2 focus:ring-[var(--emerald-custom)] focus:border-transparent outline-none text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                      placeholder="100000"
+                      min="1"
+                      step="1000"
+                      className="w-full pl-10 pr-4 py-4 bg-white/70 dark:bg-gray-800/70 border-2 border-gray-200 dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-[var(--emerald-custom)]/20 focus:border-[var(--emerald-custom)] outline-none text-xl font-semibold text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300"
                     />
+                  </div>
+                  
+                  {/* Quick Amount Buttons */}
+                  <div className="grid grid-cols-4 gap-2 mt-4">
+                    {[50000, 100000, 200000, 500000].map((amount) => (
+                      <Button
+                        key={amount}
+                        onClick={() => setNewGoal(amount.toString())}
+                        className="py-2 px-3 text-xs bg-white/50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-[var(--emerald-custom)]/10 hover:border-[var(--emerald-custom)] hover:text-[var(--emerald-custom)] transition-all duration-300"
+                      >
+                        ₹{(amount / 1000)}K
+                      </Button>
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex space-x-4 pt-4">
                   <Button
                     onClick={() => setShowGoalSetting(false)}
-                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 px-6 rounded-2xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
+                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-4 px-6 rounded-2xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 transform hover:scale-105"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleGoalUpdate}
-                    className="flex-1 bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] text-white py-3 px-6 rounded-2xl font-semibold hover:from-[var(--emerald-dark)] hover:to-[var(--emerald-custom)] transition-all duration-300"
+                    disabled={!newGoal || parseInt(newGoal) <= 0}
+                    className="flex-1 bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] text-white py-4 px-6 rounded-2xl font-semibold hover:from-[var(--emerald-dark)] hover:to-[var(--emerald-custom)] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
                   >
-                    Update Goal
+                    Set Goal
                   </Button>
                 </div>
               </div>
