@@ -43,7 +43,7 @@ export default function Home() {
     const milestoneSounds = {
       25: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
       50: "https://www.soundjay.com/misc/sounds/magic-chime-02.mp3", 
-      75: "https://www.soundjay.com/misc/sounds/bell-ringing-06.mp3",
+      75: "https://www.soundjay.com/misc/sounds/coin-drop-2.mp3",
       100: "https://www.soundjay.com/misc/sounds/magic-chime-03.mp3"
     };
 
