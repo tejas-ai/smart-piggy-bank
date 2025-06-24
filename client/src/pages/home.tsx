@@ -17,6 +17,35 @@ const quotes = [
   { text: "The habit of saving is itself an education.", author: "T.T. Munger" }
 ];
 
+const financialTips = [
+  "Start with the 50/30/20 rule: 50% needs, 30% wants, 20% savings",
+  "Emergency funds should cover 3-6 months of expenses",
+  "The earlier you start investing, the more compound interest works for you",
+  "Track your expenses for a week to understand your spending patterns",
+  "Automate your savings to make it effortless",
+  "Pay yourself first - save before spending on discretionary items",
+  "Small amounts saved regularly can grow into substantial wealth",
+  "Diversification reduces investment risk across different asset classes",
+  "High-interest debt should be paid off before investing",
+  "Review and adjust your budget monthly to stay on track"
+];
+
+const piggyThemes = {
+  default: { name: "Classic", bgGradient: "from-blue-400 to-purple-600", unlocked: true },
+  ocean: { name: "Ocean Breeze", bgGradient: "from-cyan-400 to-blue-500", unlocked: false, requirement: 50000 },
+  sunset: { name: "Golden Sunset", bgGradient: "from-orange-400 to-red-500", unlocked: false, requirement: 100000 },
+  forest: { name: "Forest Green", bgGradient: "from-green-400 to-emerald-600", unlocked: false, requirement: 200000 },
+  royal: { name: "Royal Purple", bgGradient: "from-purple-500 to-indigo-600", unlocked: false, requirement: 500000 }
+};
+
+const piggySkins = {
+  classic: { name: "Classic Pink", emoji: "🐷", unlocked: true },
+  golden: { name: "Golden Pig", emoji: "🐖", unlocked: false, requirement: 25000 },
+  crystal: { name: "Crystal Pig", emoji: "💎", unlocked: false, requirement: 75000 },
+  unicorn: { name: "Unicorn Pig", emoji: "🦄", unlocked: false, requirement: 150000 },
+  robot: { name: "Robot Pig", emoji: "🤖", unlocked: false, requirement: 300000 }
+};
+
 export default function Home() {
   const [inputAmount, setInputAmount] = useState("");
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
@@ -24,6 +53,12 @@ export default function Home() {
   const [newGoal, setNewGoal] = useState("100000");
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationMessage, setCelebrationMessage] = useState("");
+  const [showFinancialTip, setShowFinancialTip] = useState(false);
+  const [currentTip, setCurrentTip] = useState("");
+  const [tipsEnabled, setTipsEnabled] = useState(true);
+  const [selectedTheme, setSelectedTheme] = useState("default");
+  const [selectedPiggySkin, setSelectedPiggySkin] = useState("classic");
+  const [showCustomization, setShowCustomization] = useState(false);
   
   const { theme, toggleTheme } = useTheme();
   const { savedAmount, history, stats, goal, addAmount, deleteEntry, updateGoal, isLoading, isCreating, isDeleting, isUpdatingGoal } = useSavings();
@@ -224,10 +259,35 @@ export default function Home() {
       const success = await addAmount(amount);
       if (success) {
         setInputAmount("");
-        // No coin sound - only milestone sounds will play
+        
+        // Show financial tip every 3rd save if enabled
+        if (tipsEnabled && stats.totalEntries % 3 === 0) {
+          const randomTip = financialTips[Math.floor(Math.random() * financialTips.length)];
+          setCurrentTip(randomTip);
+          setShowFinancialTip(true);
+          setTimeout(() => setShowFinancialTip(false), 5000);
+        }
       }
     }
   };
+
+  // Check for unlocked themes and skins
+  const getUnlockedThemes = () => {
+    return Object.entries(piggyThemes).reduce((acc, [key, theme]) => {
+      acc[key] = { ...theme, unlocked: theme.unlocked || savedAmount >= (theme.requirement || 0) };
+      return acc;
+    }, {} as typeof piggyThemes);
+  };
+
+  const getUnlockedSkins = () => {
+    return Object.entries(piggySkins).reduce((acc, [key, skin]) => {
+      acc[key] = { ...skin, unlocked: skin.unlocked || savedAmount >= (skin.requirement || 0) };
+      return acc;
+    }, {} as typeof piggySkins);
+  };
+
+  const unlockedThemes = getUnlockedThemes();
+  const unlockedSkins = getUnlockedSkins();
 
   const handleDeleteEntry = async (id: number) => {
     const success = await deleteEntry(id);
@@ -259,9 +319,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 transition-all duration-500">
+    <div className={`min-h-screen bg-gradient-to-br ${unlockedThemes[selectedTheme]?.unlocked ? unlockedThemes[selectedTheme].bgGradient : 'from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900'} transition-all duration-500`}>
       {/* Header Controls */}
       <div className="fixed top-4 right-4 z-50 flex space-x-3">
+        <Button
+          onClick={() => setShowCustomization(true)}
+          className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
+          size="icon"
+        >
+          <div className="text-lg group-hover:scale-110 transition-transform duration-300">🎨</div>
+        </Button>
         <Button
           onClick={() => setShowGoalSetting(true)}
           className="glass-card p-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group bg-transparent border-white/20 hover:bg-white/10"
@@ -286,7 +353,7 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-8 animate-float">
           <div className="inline-block p-4 rounded-3xl glass-card mb-4 dark:shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-            <PiggyBank className="w-10 h-10 text-[var(--emerald-custom)] dark:drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+            <div className="text-5xl">{unlockedSkins[selectedPiggySkin]?.emoji || "🐷"}</div>
           </div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2 dark:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
             Smart Piggy Bank
@@ -684,6 +751,120 @@ export default function Home() {
           <div className="absolute top-1 left-1/2">
             <div className="w-1 h-1 bg-green-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
           </div>
+        </div>
+      )}
+
+      {/* Customization Modal */}
+      {showCustomization && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <Card className="glass-card rounded-3xl shadow-2xl border-white/20 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Customize Your Piggy</h3>
+                <Button
+                  onClick={() => setShowCustomization(false)}
+                  className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 p-2 rounded-xl"
+                >
+                  ✕
+                </Button>
+              </div>
+
+              {/* Financial Tips Toggle */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between p-4 bg-white/50 dark:bg-gray-800/50 rounded-2xl">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 dark:text-white">Financial Tips</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Show learning tips every few saves</p>
+                  </div>
+                  <Button
+                    onClick={() => setTipsEnabled(!tipsEnabled)}
+                    className={`px-4 py-2 rounded-xl transition-all duration-300 ${
+                      tipsEnabled 
+                        ? 'bg-[var(--emerald-custom)] text-white' 
+                        : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
+                    }`}
+                  >
+                    {tipsEnabled ? 'ON' : 'OFF'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Piggy Skins */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Piggy Skins</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {Object.entries(unlockedSkins).map(([key, skin]) => (
+                    <div
+                      key={key}
+                      onClick={() => skin.unlocked && setSelectedPiggySkin(key)}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                        selectedPiggySkin === key
+                          ? 'border-[var(--emerald-custom)] bg-[var(--emerald-custom)]/10'
+                          : skin.unlocked
+                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[var(--emerald-custom)]/50'
+                          : 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="text-3xl mb-2">{skin.emoji}</div>
+                        <div className="text-sm font-medium text-gray-800 dark:text-white">{skin.name}</div>
+                        {!skin.unlocked && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Unlock at {formatCurrency(skin.requirement || 0)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Room Themes */}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Room Themes</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {Object.entries(unlockedThemes).map(([key, theme]) => (
+                    <div
+                      key={key}
+                      onClick={() => theme.unlocked && setSelectedTheme(key)}
+                      className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                        selectedTheme === key
+                          ? 'border-[var(--emerald-custom)] bg-[var(--emerald-custom)]/10'
+                          : theme.unlocked
+                          ? 'border-gray-200 dark:border-gray-600 bg-white/50 dark:bg-gray-800/50 hover:border-[var(--emerald-custom)]/50'
+                          : 'border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <div className={`h-12 rounded-xl bg-gradient-to-r ${theme.bgGradient} mb-3`}></div>
+                      <div className="text-sm font-medium text-gray-800 dark:text-white">{theme.name}</div>
+                      {!theme.unlocked && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Unlock at {formatCurrency(theme.requirement || 0)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Financial Tip Toast */}
+      {showFinancialTip && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 pointer-events-none z-[100] animate-in slide-in-from-top duration-500">
+          <Card className="glass-card rounded-2xl border-white/30 shadow-xl dark:shadow-[0_0_20px_rgba(16,185,129,0.3)] backdrop-blur-lg max-w-md">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <div className="text-2xl">💡</div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-800 dark:text-white mb-1">Financial Tip</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{currentTip}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

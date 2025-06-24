@@ -121,6 +121,11 @@ The Smart Piggy Bank is a full-stack web application designed to help users trac
 - Statistics display (total entries, average entry, saved amount)
 - Motivational quote section
 - Mobile-responsive design with vibrant call-to-action buttons
+- Unlockable piggy skins (Classic Pink, Golden Pig, Crystal Pig, Unicorn Pig, Robot Pig)
+- Room themes (Classic, Ocean Breeze, Golden Sunset, Forest Green, Royal Purple)
+- Optional financial literacy micro-lessons shown every 3rd save
+- Customization panel with ON/OFF toggle for financial tips
+- Progressive unlocking system based on savings milestones
 
 ## User Preferences
 - Communication style: Simple, everyday language
