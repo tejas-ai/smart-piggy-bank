@@ -166,7 +166,7 @@ export default function Home() {
       const success = await addAmount(amount);
       if (success) {
         setInputAmount("");
-        playSound("https://www.soundjay.com/misc/sounds/coin-drop-2.mp3");
+        // No coin sound - only milestone sounds will play
       }
     }
   };
