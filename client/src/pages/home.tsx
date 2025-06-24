@@ -31,19 +31,25 @@ const financialTips = [
 ];
 
 const piggyThemes = {
-  default: { name: "Classic", bgGradient: "from-blue-400 to-purple-600", unlocked: true },
-  ocean: { name: "Ocean Breeze", bgGradient: "from-cyan-400 to-blue-500", unlocked: false, requirement: 50000 },
-  sunset: { name: "Golden Sunset", bgGradient: "from-orange-400 to-red-500", unlocked: false, requirement: 100000 },
-  forest: { name: "Forest Green", bgGradient: "from-green-400 to-emerald-600", unlocked: false, requirement: 200000 },
-  royal: { name: "Royal Purple", bgGradient: "from-purple-500 to-indigo-600", unlocked: false, requirement: 500000 }
+  default: { name: "Classic", bgGradient: "from-blue-400 to-purple-600", unlocked: true, percentage: 0 },
+  ocean: { name: "Ocean Breeze", bgGradient: "from-cyan-400 to-blue-500", unlocked: false, percentage: 15 },
+  sunset: { name: "Golden Sunset", bgGradient: "from-orange-400 to-red-500", unlocked: false, percentage: 30 },
+  forest: { name: "Forest Green", bgGradient: "from-green-400 to-emerald-600", unlocked: false, percentage: 45 },
+  royal: { name: "Royal Purple", bgGradient: "from-purple-500 to-indigo-600", unlocked: false, percentage: 60 },
+  cosmic: { name: "Cosmic Space", bgGradient: "from-indigo-600 to-purple-800", unlocked: false, percentage: 75 },
+  fire: { name: "Fire Ember", bgGradient: "from-red-500 to-orange-600", unlocked: false, percentage: 90 },
+  diamond: { name: "Diamond Elite", bgGradient: "from-gray-300 to-blue-200", unlocked: false, percentage: 100 }
 };
 
 const piggySkins = {
-  classic: { name: "Classic Pink", emoji: "🐷", unlocked: true },
-  golden: { name: "Golden Pig", emoji: "🐖", unlocked: false, requirement: 25000 },
-  crystal: { name: "Crystal Pig", emoji: "💎", unlocked: false, requirement: 75000 },
-  unicorn: { name: "Unicorn Pig", emoji: "🦄", unlocked: false, requirement: 150000 },
-  robot: { name: "Robot Pig", emoji: "🤖", unlocked: false, requirement: 300000 }
+  classic: { name: "Classic Pink", emoji: "🐷", unlocked: true, percentage: 0 },
+  golden: { name: "Golden Pig", emoji: "🐖", unlocked: false, percentage: 15 },
+  crystal: { name: "Crystal Pig", emoji: "💎", unlocked: false, percentage: 30 },
+  unicorn: { name: "Unicorn Pig", emoji: "🦄", unlocked: false, percentage: 45 },
+  robot: { name: "Robot Pig", emoji: "🤖", unlocked: false, percentage: 60 },
+  alien: { name: "Alien Pig", emoji: "👽", unlocked: false, percentage: 75 },
+  dragon: { name: "Dragon Pig", emoji: "🐉", unlocked: false, percentage: 90 },
+  crown: { name: "Royal Crown", emoji: "👑", unlocked: false, percentage: 100 }
 };
 
 export default function Home() {
@@ -271,17 +277,17 @@ export default function Home() {
     }
   };
 
-  // Check for unlocked themes and skins
+  // Check for unlocked themes and skins based on progress percentage
   const getUnlockedThemes = () => {
     return Object.entries(piggyThemes).reduce((acc, [key, theme]) => {
-      acc[key] = { ...theme, unlocked: theme.unlocked || savedAmount >= (theme.requirement || 0) };
+      acc[key] = { ...theme, unlocked: theme.unlocked || stats.progress >= theme.percentage };
       return acc;
     }, {} as typeof piggyThemes);
   };
 
   const getUnlockedSkins = () => {
     return Object.entries(piggySkins).reduce((acc, [key, skin]) => {
-      acc[key] = { ...skin, unlocked: skin.unlocked || savedAmount >= (skin.requirement || 0) };
+      acc[key] = { ...skin, unlocked: skin.unlocked || stats.progress >= skin.percentage };
       return acc;
     }, {} as typeof piggySkins);
   };
@@ -791,7 +797,7 @@ export default function Home() {
 
               {/* Piggy Skins */}
               <div className="mb-8">
-                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Piggy Skins</h4>
+                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Piggy Skins (7 Total)</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {Object.entries(unlockedSkins).map(([key, skin]) => (
                     <div
@@ -810,7 +816,7 @@ export default function Home() {
                         <div className="text-sm font-medium text-gray-800 dark:text-white">{skin.name}</div>
                         {!skin.unlocked && (
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Unlock at {formatCurrency(skin.requirement || 0)}
+                            Unlock at {skin.percentage}%
                           </div>
                         )}
                       </div>
@@ -821,7 +827,7 @@ export default function Home() {
 
               {/* Room Themes */}
               <div>
-                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Room Themes</h4>
+                <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Room Themes (7 Total)</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Object.entries(unlockedThemes).map(([key, theme]) => (
                     <div
@@ -839,7 +845,7 @@ export default function Home() {
                       <div className="text-sm font-medium text-gray-800 dark:text-white">{theme.name}</div>
                       {!theme.unlocked && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Unlock at {formatCurrency(theme.requirement || 0)}
+                          Unlock at {theme.percentage}%
                         </div>
                       )}
                     </div>
