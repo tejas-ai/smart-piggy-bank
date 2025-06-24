@@ -51,39 +51,84 @@ export function formatNumber(num: number): string {
 }
 
 export function playCoinDropSound() {
-  // Create a coin drop sound using Web Audio API
+  // Create a realistic metallic coin drop sound using Web Audio API
   try {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const now = audioContext.currentTime;
     
-    // Create a short, bright metallic sound for coin drop
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    const biquadFilter = audioContext.createBiquadFilter();
+    // Create multiple oscillators for metallic harmonics
+    const frequencies = [1200, 1800, 2400, 3600]; // Metallic frequencies
+    const oscillators: OscillatorNode[] = [];
+    const gainNodes: GainNode[] = [];
     
-    // Connect the nodes
-    oscillator.connect(biquadFilter);
-    biquadFilter.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    // Master gain for overall volume
+    const masterGain = audioContext.createGain();
+    masterGain.connect(audioContext.destination);
     
-    // Configure the sound
-    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
-    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
+    // Create multiple harmonic layers
+    frequencies.forEach((freq, index) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+      
+      // Configure filter for metallic resonance
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(freq, now);
+      filter.Q.setValueAtTime(20 + index * 5, now);
+      
+      // Connect the chain
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(masterGain);
+      
+      // Configure oscillator
+      osc.type = index % 2 === 0 ? 'triangle' : 'square';
+      osc.frequency.setValueAtTime(freq, now);
+      
+      // Create realistic coin bounce with frequency modulation
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + 0.05);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.6, now + 0.15);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.4, now + 0.35);
+      
+      // Individual gain envelope with different decay rates
+      const volume = 0.15 / (index + 1); // Decreasing volume for higher harmonics
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(volume, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(volume * 0.3, now + 0.08);
+      gain.gain.exponentialRampToValueAtTime(volume * 0.1, now + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      
+      oscillators.push(osc);
+      gainNodes.push(gain);
+    });
     
-    // Add metallic resonance
-    biquadFilter.type = 'bandpass';
-    biquadFilter.frequency.setValueAtTime(1200, audioContext.currentTime);
-    biquadFilter.Q.setValueAtTime(15, audioContext.currentTime);
+    // Add metallic "ring" with delay
+    const delayNode = audioContext.createDelay(0.1);
+    const delayGain = audioContext.createGain();
+    const delayFilter = audioContext.createBiquadFilter();
     
-    // Volume envelope for natural coin drop
-    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+    delayNode.delayTime.setValueAtTime(0.05, now);
+    delayGain.gain.setValueAtTime(0.2, now);
+    delayFilter.type = 'highpass';
+    delayFilter.frequency.setValueAtTime(800, now);
     
-    oscillator.type = 'triangle';
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.4);
+    masterGain.connect(delayNode);
+    delayNode.connect(delayFilter);
+    delayFilter.connect(delayGain);
+    delayGain.connect(masterGain);
+    
+    // Master volume envelope
+    masterGain.gain.setValueAtTime(0, now);
+    masterGain.gain.linearRampToValueAtTime(1, now + 0.005);
+    masterGain.gain.exponentialRampToValueAtTime(0.6, now + 0.1);
+    masterGain.gain.exponentialRampToValueAtTime(0.3, now + 0.25);
+    masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    
+    // Start all oscillators
+    oscillators.forEach(osc => {
+      osc.start(now);
+      osc.stop(now + 0.6);
+    });
     
   } catch (error) {
     console.log('Coin drop sound failed:', error);
