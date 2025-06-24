@@ -24,7 +24,7 @@ export default function Home() {
   const [newGoal, setNewGoal] = useState("100000");
   
   const { theme, toggleTheme } = useTheme();
-  const { savedAmount, history, stats, goal, addAmount, deleteEntry, isLoading, isCreating, isDeleting } = useSavings();
+  const { savedAmount, history, stats, goal, addAmount, deleteEntry, updateGoal, isLoading, isCreating, isDeleting, isUpdatingGoal } = useSavings();
 
   useEffect(() => {
     setNewGoal(goal.toString());
@@ -94,13 +94,14 @@ export default function Home() {
     playSound("https://www.soundjay.com/misc/sounds/button-4.mp3");
   };
 
-  const handleGoalUpdate = () => {
+  const handleGoalUpdate = async () => {
     const goalAmount = parseInt(newGoal);
     if (goalAmount && goalAmount > 0) {
-      // In a real app, this would update the goal via API
-      // For now, just close the modal
-      setShowGoalSetting(false);
-      playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
+      const success = await updateGoal(goalAmount);
+      if (success) {
+        setShowGoalSetting(false);
+        playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
+      }
     }
   };
 
@@ -464,10 +465,17 @@ export default function Home() {
                   </Button>
                   <Button
                     onClick={handleGoalUpdate}
-                    disabled={!newGoal || parseInt(newGoal) <= 0}
+                    disabled={!newGoal || parseInt(newGoal) <= 0 || isUpdatingGoal}
                     className="flex-1 bg-gradient-to-r from-[var(--emerald-custom)] to-[var(--emerald-light)] text-white py-4 px-6 rounded-2xl font-semibold hover:from-[var(--emerald-dark)] hover:to-[var(--emerald-custom)] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg hover:shadow-xl"
                   >
-                    Set Goal
+                    {isUpdatingGoal ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Updating...
+                      </div>
+                    ) : (
+                      "Set Goal"
+                    )}
                   </Button>
                 </div>
               </div>
