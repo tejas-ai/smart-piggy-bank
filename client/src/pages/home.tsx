@@ -30,6 +30,33 @@ export default function Home() {
     setNewGoal(goal.toString());
   }, [goal]);
 
+  // Track previous progress to detect milestone crossings
+  const [previousProgress, setPreviousProgress] = useState(0);
+
+  useEffect(() => {
+    const currentProgress = stats.progress;
+    
+    // Check for milestone crossings
+    const milestones = [25, 50, 75, 100];
+    const milestoneSounds = {
+      25: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
+      50: "https://www.soundjay.com/misc/sounds/magic-chime-02.mp3", 
+      75: "https://www.soundjay.com/misc/sounds/success-fanfare-trumpets-02.mp3",
+      100: "https://www.soundjay.com/misc/sounds/victory-celebration-01.mp3"
+    };
+
+    milestones.forEach(milestone => {
+      if (previousProgress < milestone && currentProgress >= milestone) {
+        // Milestone reached! Play celebration sound
+        setTimeout(() => {
+          playSound(milestoneSounds[milestone]);
+        }, 500); // Small delay for better UX
+      }
+    });
+
+    setPreviousProgress(currentProgress);
+  }, [stats.progress, previousProgress]);
+
   // Achievement system
   const achievements = [
     {
