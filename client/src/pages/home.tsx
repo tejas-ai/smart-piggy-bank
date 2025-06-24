@@ -75,6 +75,8 @@ export default function Home() {
 
   // Track previous progress to detect milestone crossings
   const [previousProgress, setPreviousProgress] = useState(0);
+  // Track previous total entries to detect when to show financial tips
+  const [previousTotalEntries, setPreviousTotalEntries] = useState(0);
 
   useEffect(() => {
     const currentProgress = stats.progress;
@@ -218,6 +220,24 @@ export default function Home() {
     setPreviousProgress(currentProgress);
   }, [stats.progress, previousProgress]);
 
+  // Effect to handle financial tips when totalEntries changes
+  useEffect(() => {
+    const currentEntries = stats.totalEntries;
+    
+    // Only show tip if entries increased and it's a multiple of 3
+    if (currentEntries > previousTotalEntries && 
+        tipsEnabled && 
+        currentEntries % 3 === 0 && 
+        currentEntries > 0) {
+      const randomTip = financialTips[Math.floor(Math.random() * financialTips.length)];
+      setCurrentTip(randomTip);
+      setShowFinancialTip(true);
+      setTimeout(() => setShowFinancialTip(false), 6000);
+    }
+    
+    setPreviousTotalEntries(currentEntries);
+  }, [stats.totalEntries, previousTotalEntries, tipsEnabled]);
+
   // Achievement system
   const achievements = [
     {
@@ -265,14 +285,6 @@ export default function Home() {
       const success = await addAmount(amount);
       if (success) {
         setInputAmount("");
-        
-        // Show financial tip every 3rd save if enabled
-        if (tipsEnabled && stats.totalEntries % 3 === 0) {
-          const randomTip = financialTips[Math.floor(Math.random() * financialTips.length)];
-          setCurrentTip(randomTip);
-          setShowFinancialTip(true);
-          setTimeout(() => setShowFinancialTip(false), 5000);
-        }
       }
     }
   };
