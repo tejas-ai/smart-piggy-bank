@@ -528,80 +528,58 @@ export default function Home() {
         </div>
       )}
 
-      {/* Celebration Animation */}
+      {/* Celebration Animation - Subtle Toast Style */}
       {showCelebration && (
-        <div className="fixed inset-0 pointer-events-none z-[100] flex items-center justify-center">
-          {/* Confetti Animation */}
-          <div className="absolute inset-0">
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-2 h-2 opacity-80 animate-bounce"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'][Math.floor(Math.random() * 5)],
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${2 + Math.random() * 2}s`,
-                  transform: `rotate(${Math.random() * 360}deg)`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Central Celebration Message */}
-          <div className="relative z-10 transform animate-pulse">
-            <Card className="glass-card rounded-3xl border-white/30 shadow-2xl dark:shadow-[0_0_40px_rgba(16,185,129,0.4)] backdrop-blur-lg">
-              <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-4 animate-bounce">🎊</div>
-                <h2 className="text-3xl font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2 animate-pulse">
-                  {celebrationMessage}
-                </h2>
-                <div className="text-lg text-gray-600 dark:text-gray-300 animate-pulse">
-                  Keep up the amazing work!
-                </div>
-                
-                {/* Animated Progress Ring */}
-                <div className="mt-6 flex justify-center">
-                  <div className="relative">
-                    <svg className="w-16 h-16 transform -rotate-90 animate-spin" style={{ animationDuration: '3s' }}>
-                      <circle
-                        cx="32"
-                        cy="32"
-                        r="28"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                        className="text-[var(--emerald-custom)] opacity-80"
-                        strokeDasharray={`${stats.progress * 1.76} 176`}
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-bold text-[var(--emerald-custom)] animate-pulse">
-                        {Math.round(stats.progress)}%
-                      </span>
-                    </div>
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 pointer-events-none z-[100] animate-in slide-in-from-top duration-500">
+          <Card className="glass-card rounded-2xl border-white/30 shadow-xl dark:shadow-[0_0_20px_rgba(16,185,129,0.3)] backdrop-blur-lg max-w-sm">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl animate-bounce">🎉</div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-white">
+                    {celebrationMessage}
+                  </h3>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
+                    {Math.round(stats.progress)}% Complete!
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div className="relative">
+                  <svg className="w-8 h-8 transform -rotate-90">
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      className="text-gray-200 dark:text-gray-700"
+                    />
+                    <circle
+                      cx="16"
+                      cy="16"
+                      r="12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      className="text-[var(--emerald-custom)] animate-pulse"
+                      strokeDasharray={`${stats.progress * 0.75} 75`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
-          {/* Fireworks Animation */}
-          <div className="absolute inset-0">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={`firework-${i}`}
-                className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-ping"
-                style={{
-                  left: `${20 + Math.random() * 60}%`,
-                  top: `${20 + Math.random() * 60}%`,
-                  animationDelay: `${i * 0.3}s`,
-                  animationDuration: '1.5s'
-                }}
-              />
-            ))}
+          {/* Subtle Sparkles */}
+          <div className="absolute -top-2 -right-2">
+            <div className="w-1 h-1 bg-yellow-400 rounded-full animate-ping"></div>
+          </div>
+          <div className="absolute -bottom-1 -left-1">
+            <div className="w-1 h-1 bg-blue-400 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+          </div>
+          <div className="absolute top-1 left-1/2">
+            <div className="w-1 h-1 bg-green-400 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
           </div>
         </div>
       )}
