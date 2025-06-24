@@ -40,11 +40,55 @@ export default function Home() {
     
     // Check for milestone crossings
     const milestones = [25, 50, 75, 100];
-    const milestoneSounds = {
-      25: "https://www.soundjay.com/misc/sounds/ding-idea-40142.mp3", // Sparkle/Ding
-      50: "https://www.soundjay.com/misc/sounds/whoosh-6316.mp3", // Whoosh Rise
-      75: "https://www.soundjay.com/misc/sounds/drumroll-please-99704.mp3", // Drumroll Reveal
-      100: "https://www.soundjay.com/misc/sounds/royal-fanfare-trumpet-16149.mp3" // Royal Indian Fanfare
+    // Create different frequency tones for each milestone
+    const createTone = (frequency: number, duration: number = 0.3) => {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    };
+
+    const playMilestoneSound = (milestone: number) => {
+      try {
+        switch(milestone) {
+          case 25: // Gentle ding
+            createTone(800, 0.3);
+            break;
+          case 50: // Rising whoosh
+            createTone(400, 0.2);
+            setTimeout(() => createTone(600, 0.2), 100);
+            setTimeout(() => createTone(800, 0.2), 200);
+            break;
+          case 75: // Drumroll effect
+            for(let i = 0; i < 5; i++) {
+              setTimeout(() => createTone(200, 0.1), i * 50);
+            }
+            break;
+          case 100: // Royal fanfare
+            createTone(523, 0.4); // C5
+            setTimeout(() => createTone(659, 0.4), 200); // E5
+            setTimeout(() => createTone(784, 0.6), 400); // G5
+            break;
+        }
+      } catch (error) {
+        console.log("Web Audio API not supported, using fallback");
+        // Fallback to simple beep
+        const audio = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+L0x3okBSl+zPLZiTYIG2m98OScTgwOUarm7rlmGgU8k9n1z38qBSF8xe/+lgwIZQz9VQ==");
+        audio.volume = 0.5;
+        audio.play().catch(() => {});
+      }
     };
 
     milestones.forEach(milestone => {
@@ -61,8 +105,8 @@ export default function Home() {
         setShowCelebration(true);
         
         setTimeout(() => {
-          console.log(`Playing milestone sound for ${milestone}%:`, milestoneSounds[milestone]);
-          playSound(milestoneSounds[milestone]);
+          console.log(`Playing milestone sound for ${milestone}%`);
+          playMilestoneSound(milestone);
         }, 300);
 
         // Hide celebration after 3 seconds
