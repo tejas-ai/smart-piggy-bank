@@ -75,13 +75,14 @@ export default function Home() {
               osc.frequency.setValueAtTime(freq, audioContext.currentTime + time);
               osc.type = 'sine';
               gain.gain.setValueAtTime(0, audioContext.currentTime + time);
-              gain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + time + 0.01);
-              gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + time + 0.6);
+              gain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + time + 0.01);
+              gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + time + 0.8);
               osc.start(audioContext.currentTime + time);
-              osc.stop(audioContext.currentTime + time + 0.6);
+              osc.stop(audioContext.currentTime + time + 0.8);
             };
             createBell(1047, 0); // C6
             createBell(1319, 0.1); // E6
+            createBell(1568, 0.2); // G6 for richer sound
             break;
             
           case 50: // Ascending chimes
@@ -95,11 +96,11 @@ export default function Home() {
                 osc.frequency.setValueAtTime(freq, audioContext.currentTime);
                 osc.type = 'triangle';
                 gain.gain.setValueAtTime(0, audioContext.currentTime);
-                gain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                gain.gain.linearRampToValueAtTime(0.35, audioContext.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
                 osc.start();
-                osc.stop(audioContext.currentTime + 0.3);
-              }, i * 150);
+                osc.stop(audioContext.currentTime + 0.5);
+              }, i * 120);
             });
             break;
             
@@ -114,20 +115,34 @@ export default function Home() {
                 gain.connect(audioContext.destination);
                 osc.frequency.setValueAtTime(freq, audioContext.currentTime);
                 osc.type = 'sawtooth';
-                const volume = 0.1 + (i * 0.02); // Increasing volume
+                const volume = 0.2 + (i * 0.04); // Louder increasing volume
                 gain.gain.setValueAtTime(0, audioContext.currentTime);
                 gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.25);
                 osc.start();
-                osc.stop(audioContext.currentTime + 0.15);
-              }, i * 80);
+                osc.stop(audioContext.currentTime + 0.25);
+              }, i * 60);
             });
             break;
             
-          case 100: // Royal fanfare remains the same
-            createTone(523, 0.4); // C5
-            setTimeout(() => createTone(659, 0.4), 200); // E5
-            setTimeout(() => createTone(784, 0.6), 400); // G5
+          case 100: // Royal fanfare - enhanced
+            const createFanfare = (freq: number, time: number, duration: number) => {
+              const osc = audioContext.createOscillator();
+              const gain = audioContext.createGain();
+              osc.connect(gain);
+              gain.connect(audioContext.destination);
+              osc.frequency.setValueAtTime(freq, audioContext.currentTime + time);
+              osc.type = 'triangle';
+              gain.gain.setValueAtTime(0, audioContext.currentTime + time);
+              gain.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + time + 0.01);
+              gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + time + duration);
+              osc.start(audioContext.currentTime + time);
+              osc.stop(audioContext.currentTime + time + duration);
+            };
+            createFanfare(523, 0, 0.5); // C5
+            createFanfare(659, 0.2, 0.5); // E5
+            createFanfare(784, 0.4, 0.7); // G5
+            createFanfare(1047, 0.6, 0.8); // C6
             break;
         }
       } catch (error) {
