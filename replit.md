@@ -93,9 +93,28 @@ The Smart Piggy Bank is a full-stack web application designed to help users trac
 - **Port Configuration**: Serves on port 5000 (mapped to external port 80)
 - **Module System**: ES modules throughout the application
 
-## Changelog
-- June 24, 2025. Initial setup
+## Recent Changes
+- June 24, 2025: Complete Smart Piggy Bank application developed with dark-themed UI, glowing visuals, and Gen Z aesthetic
+- Fixed goal setting functionality with proper backend storage and API endpoints
+- Implemented achievements system with 5 milestone-based rewards
+- Added circular progress visualization with SVG animations and gradient effects
+- Integrated motivational quotes system with randomized display
+- Created responsive mobile-first design with smooth animations
+- Added proper data persistence using in-memory storage with goal management
+- Footer credit updated to "Created by Mr. Tejas.J.Handigol" as specified
+
+## Key Features Implemented
+- Savings entry system with amount input and history tracking
+- Customizable savings goals (default ₹1,00,000) with modal interface  
+- Circular progress bar showing percentage completion
+- Achievement system unlocking based on milestones
+- Dark/light theme toggle with glowing effects
+- Savings history with timestamps and delete functionality
+- Statistics display (total entries, average entry, saved amount)
+- Motivational quote section
+- Mobile-responsive design with vibrant call-to-action buttons
 
 ## User Preferences
-
-Preferred communication style: Simple, everyday language.
+- Communication style: Simple, everyday language
+- Design preference: Clean, dark-themed modern UI with glowing visuals and Gen Z-friendly aesthetic
+- Footer credit: "Created by Mr. Tejas.J.Handigol"

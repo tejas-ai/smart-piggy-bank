@@ -391,7 +391,7 @@ export default function Home() {
               <div className="flex flex-col items-center space-y-3">
                 <div className="text-3xl mb-2">👑</div>
                 <div className="text-lg font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
-                  Designed & Developed by Tejas J. Handigol
+                  Created by Mr. Tejas.J.Handigol
                 </div>
                 <div className="text-sm italic text-gray-600 dark:text-gray-300">
                   Crafted with precision for future millionaires.
