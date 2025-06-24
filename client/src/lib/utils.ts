@@ -49,3 +49,43 @@ export function formatCurrency(amount: number): string {
 export function formatNumber(num: number): string {
   return new Intl.NumberFormat('en-IN').format(num);
 }
+
+export function playCoinDropSound() {
+  // Create a coin drop sound using Web Audio API
+  try {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    // Create a short, bright metallic sound for coin drop
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const biquadFilter = audioContext.createBiquadFilter();
+    
+    // Connect the nodes
+    oscillator.connect(biquadFilter);
+    biquadFilter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Configure the sound
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1);
+    oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.3);
+    
+    // Add metallic resonance
+    biquadFilter.type = 'bandpass';
+    biquadFilter.frequency.setValueAtTime(1200, audioContext.currentTime);
+    biquadFilter.Q.setValueAtTime(15, audioContext.currentTime);
+    
+    // Volume envelope for natural coin drop
+    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+    
+    oscillator.type = 'triangle';
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.4);
+    
+  } catch (error) {
+    console.log('Coin drop sound failed:', error);
+  }
+}

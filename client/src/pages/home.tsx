@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTheme } from "@/components/theme-provider";
 import { useSavings } from "@/hooks/use-savings";
-import { cn, playSound, formatCurrency, formatNumber } from "@/lib/utils";
+import { cn, playSound, playCoinDropSound, formatCurrency, formatNumber } from "@/lib/utils";
 
 const quotes = [
   { text: "Do something today that your future self will thank you for.", author: "Sean Patrick Flanery" },
@@ -341,6 +341,8 @@ export default function Home() {
       const success = await addAmount(amount);
       if (success) {
         setInputAmount("");
+        // Play coin drop sound for regular payments (milestone sounds are handled separately)
+        playCoinDropSound();
       }
     }
   };
