@@ -164,7 +164,6 @@ export default function Home() {
         setShowCelebration(true);
         
         setTimeout(() => {
-          console.log(`Playing milestone sound for ${milestone}%`);
           playMilestoneSound(milestone);
         }, 300);
 
