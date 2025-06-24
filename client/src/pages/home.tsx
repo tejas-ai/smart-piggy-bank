@@ -62,32 +62,76 @@ export default function Home() {
 
     const playMilestoneSound = (milestone: number) => {
       try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        
         switch(milestone) {
-          case 25: // Gentle ding
-            createTone(800, 0.3);
+          case 25: // Sparkle bell
+            // Create a pleasant bell-like sound with harmonics
+            const createBell = (freq: number, time: number) => {
+              const osc = audioContext.createOscillator();
+              const gain = audioContext.createGain();
+              osc.connect(gain);
+              gain.connect(audioContext.destination);
+              osc.frequency.setValueAtTime(freq, audioContext.currentTime + time);
+              osc.type = 'sine';
+              gain.gain.setValueAtTime(0, audioContext.currentTime + time);
+              gain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + time + 0.01);
+              gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + time + 0.6);
+              osc.start(audioContext.currentTime + time);
+              osc.stop(audioContext.currentTime + time + 0.6);
+            };
+            createBell(1047, 0); // C6
+            createBell(1319, 0.1); // E6
             break;
-          case 50: // Rising whoosh
-            createTone(400, 0.2);
-            setTimeout(() => createTone(600, 0.2), 100);
-            setTimeout(() => createTone(800, 0.2), 200);
+            
+          case 50: // Ascending chimes
+            const freqs = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            freqs.forEach((freq, i) => {
+              setTimeout(() => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+                osc.type = 'triangle';
+                gain.gain.setValueAtTime(0, audioContext.currentTime);
+                gain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+              }, i * 150);
+            });
             break;
-          case 75: // Drumroll effect
-            for(let i = 0; i < 5; i++) {
-              setTimeout(() => createTone(200, 0.1), i * 50);
-            }
+            
+          case 75: // Excitement build-up
+            // Quick ascending notes with increasing intensity
+            const buildFreqs = [392, 440, 494, 523, 587, 659, 698, 784];
+            buildFreqs.forEach((freq, i) => {
+              setTimeout(() => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+                osc.type = 'sawtooth';
+                const volume = 0.1 + (i * 0.02); // Increasing volume
+                gain.gain.setValueAtTime(0, audioContext.currentTime);
+                gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.15);
+              }, i * 80);
+            });
             break;
-          case 100: // Royal fanfare
+            
+          case 100: // Royal fanfare remains the same
             createTone(523, 0.4); // C5
             setTimeout(() => createTone(659, 0.4), 200); // E5
             setTimeout(() => createTone(784, 0.6), 400); // G5
             break;
         }
       } catch (error) {
-        console.log("Web Audio API not supported, using fallback");
-        // Fallback to simple beep
-        const audio = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+L0x3okBSl+zPLZiTYIG2m98OScTgwOUarm7rlmGgU8k9n1z38qBSF8xe/+lgwIZQz9VQ==");
-        audio.volume = 0.5;
-        audio.play().catch(() => {});
+        console.log("Web Audio API not supported");
       }
     };
 
