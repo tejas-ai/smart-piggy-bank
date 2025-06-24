@@ -22,6 +22,8 @@ export default function Home() {
   const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
   const [showGoalSetting, setShowGoalSetting] = useState(false);
   const [newGoal, setNewGoal] = useState("100000");
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationMessage, setCelebrationMessage] = useState("");
   
   const { theme, toggleTheme } = useTheme();
   const { savedAmount, history, stats, goal, addAmount, deleteEntry, updateGoal, isLoading, isCreating, isDeleting, isUpdatingGoal } = useSavings();
@@ -47,10 +49,25 @@ export default function Home() {
 
     milestones.forEach(milestone => {
       if (previousProgress < milestone && currentProgress >= milestone) {
-        // Milestone reached! Play celebration sound
+        // Milestone reached! Play celebration sound and show animation
+        const celebrationMessages = {
+          25: "🎉 Quarter Way There! 🎉",
+          50: "🔥 Halfway Champion! 🔥", 
+          75: "⚡ Almost There! ⚡",
+          100: "👑 GOAL ACHIEVED! 👑"
+        };
+
+        setCelebrationMessage(celebrationMessages[milestone]);
+        setShowCelebration(true);
+        
         setTimeout(() => {
           playSound(milestoneSounds[milestone]);
-        }, 500); // Small delay for better UX
+        }, 300);
+
+        // Hide celebration after 3 seconds
+        setTimeout(() => {
+          setShowCelebration(false);
+        }, 3000);
       }
     });
 
@@ -508,6 +525,84 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Celebration Animation */}
+      {showCelebration && (
+        <div className="fixed inset-0 pointer-events-none z-[100] flex items-center justify-center">
+          {/* Confetti Animation */}
+          <div className="absolute inset-0">
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 opacity-80 animate-bounce"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'][Math.floor(Math.random() * 5)],
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`,
+                  transform: `rotate(${Math.random() * 360}deg)`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Central Celebration Message */}
+          <div className="relative z-10 transform animate-pulse">
+            <Card className="glass-card rounded-3xl border-white/30 shadow-2xl dark:shadow-[0_0_40px_rgba(16,185,129,0.4)] backdrop-blur-lg">
+              <CardContent className="p-8 text-center">
+                <div className="text-6xl mb-4 animate-bounce">🎊</div>
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2 animate-pulse">
+                  {celebrationMessage}
+                </h2>
+                <div className="text-lg text-gray-600 dark:text-gray-300 animate-pulse">
+                  Keep up the amazing work!
+                </div>
+                
+                {/* Animated Progress Ring */}
+                <div className="mt-6 flex justify-center">
+                  <div className="relative">
+                    <svg className="w-16 h-16 transform -rotate-90 animate-spin" style={{ animationDuration: '3s' }}>
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r="28"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                        className="text-[var(--emerald-custom)] opacity-80"
+                        strokeDasharray={`${stats.progress * 1.76} 176`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-[var(--emerald-custom)] animate-pulse">
+                        {Math.round(stats.progress)}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Fireworks Animation */}
+          <div className="absolute inset-0">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={`firework-${i}`}
+                className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-ping"
+                style={{
+                  left: `${20 + Math.random() * 60}%`,
+                  top: `${20 + Math.random() * 60}%`,
+                  animationDelay: `${i * 0.3}s`,
+                  animationDuration: '1.5s'
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

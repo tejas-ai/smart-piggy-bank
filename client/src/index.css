@@ -119,4 +119,38 @@
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-5px); }
   }
+
+  @keyframes confetti {
+    0% { 
+      transform: translateY(-100vh) rotate(0deg); 
+      opacity: 1; 
+    }
+    100% { 
+      transform: translateY(100vh) rotate(720deg); 
+      opacity: 0; 
+    }
+  }
+
+  @keyframes firework {
+    0% { 
+      transform: scale(0); 
+      opacity: 1; 
+    }
+    50% { 
+      transform: scale(1); 
+      opacity: 1; 
+    }
+    100% { 
+      transform: scale(1.5); 
+      opacity: 0; 
+    }
+  }
+
+  .confetti-piece {
+    animation: confetti 3s ease-out forwards;
+  }
+
+  .firework-burst {
+    animation: firework 1.5s ease-out forwards;
+  }
 }
