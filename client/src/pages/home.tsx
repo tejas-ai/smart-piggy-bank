@@ -43,8 +43,8 @@ export default function Home() {
     const milestoneSounds = {
       25: "https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3",
       50: "https://www.soundjay.com/misc/sounds/magic-chime-02.mp3", 
-      75: "https://www.soundjay.com/misc/sounds/success-fanfare-trumpets-02.mp3",
-      100: "https://www.soundjay.com/misc/sounds/victory-celebration-01.mp3"
+      75: "https://www.soundjay.com/misc/sounds/bell-ringing-06.mp3",
+      100: "https://www.soundjay.com/misc/sounds/magic-chime-03.mp3"
     };
 
     milestones.forEach(milestone => {
@@ -61,6 +61,7 @@ export default function Home() {
         setShowCelebration(true);
         
         setTimeout(() => {
+          console.log(`Playing milestone sound for ${milestone}%:`, milestoneSounds[milestone]);
           playSound(milestoneSounds[milestone]);
         }, 300);
 
