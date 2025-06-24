@@ -102,13 +102,13 @@ The Smart Piggy Bank is a full-stack web application designed to help users trac
 - Created responsive mobile-first design with smooth animations
 - Added proper data persistence using in-memory storage with goal management
 - Footer credit updated to "Created by Mr. Tejas.J.Handigol" as specified
-- Implemented progressive milestone celebration system with enhanced Web Audio API sound effects:
+- Implemented milestone-specific sound effects system using Web Audio API:
   * 25%: Rich sparkle bell with three harmonics (C6, E6, G6)
   * 50%: Ascending chimes progression with sustained notes
   * 75%: Intense excitement build-up with 8 ascending notes
-  * 100%: Majestic royal fanfare with four-note progression
-- Refined celebration animations to clean toast notifications with subtle sparkles
-- Removed background coin sounds to focus on milestone achievements only
+- Removed all coin dropping sounds for regular payments
+- Sound effects only play at major milestone achievements (25%, 50%, 75%)
+- Clean milestone celebrations with toast notifications and subtle sparkles
 - Enhanced audio clarity and volume for better user experience
 - Expanded gamification to 7 piggy skins and 7 room themes with achievement-based unlocking
 - Fixed financial literacy tips to display properly every 3rd save when enabled

@@ -137,8 +137,8 @@ export default function Home() {
   useEffect(() => {
     const currentProgress = stats.progress;
     
-    // Check for milestone crossings
-    const milestones = [25, 50, 75, 100];
+    // Check for milestone crossings (only play sounds at 25%, 50%, 75%)
+    const milestones = [25, 50, 75];
     // Create different frequency tones for each milestone
     const createTone = (frequency: number, duration: number = 0.3) => {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -365,14 +365,12 @@ export default function Home() {
 
   const handleDeleteEntry = async (id: number) => {
     const success = await deleteEntry(id);
-    if (success) {
-      playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
-    }
+    // No sound effect for delete action
   };
 
   const handleThemeToggle = () => {
     toggleTheme();
-    playSound("https://www.soundjay.com/misc/sounds/button-4.mp3");
+    // No sound effect for theme toggle
   };
 
   const handleGoalUpdate = async () => {
@@ -381,7 +379,7 @@ export default function Home() {
       const success = await updateGoal(goalAmount);
       if (success) {
         setShowGoalSetting(false);
-        playSound("https://www.soundjay.com/misc/sounds/button-3.mp3");
+        // No sound effect for goal update
       }
     }
   };
