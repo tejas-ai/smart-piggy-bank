@@ -1,7 +1,7 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 const pool = new Pool({
-  connectionString: "postgresql://postgres:eFrDEIpvEmcjCQphishAnIpJWrqmmYsW@postgres.railway.internal:5432/railway"
+  connectionString: process.env.DATABASE_URL
 });
 
-module.exports = pool;
+export default pool;
