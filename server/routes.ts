@@ -1,15 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { Pool } from "pg";
 import { insertSavingsEntrySchema } from "@shared/schema";
 import { z } from "zod";
+
+// Connect to your database helper
+const pool = require("../database.js");
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all savings entries
   app.get("/api/savings", async (req, res) => {
     try {
-      const entries = await storage.getSavingsEntries();
-      res.json(entries);
+      const { rows } = await pool.query(
+        "SELECT * FROM savings ORDER BY date DESC"
+      );
+      res.json(rows);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch savings entries" });
     }
@@ -19,8 +24,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/savings", async (req, res) => {
     try {
       const data = insertSavingsEntrySchema.parse(req.body);
-      const entry = await storage.createSavingsEntry(data);
-      res.status(201).json(entry);
+      const { rows } = await pool.query(
+        "INSERT INTO savings (amount, description) VALUES ($1, $2) RETURNING *",
+        [data.amount, data.description]
+      );
+      res.status(201).json(rows[0]);
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Invalid input", errors: error.errors });
@@ -37,12 +45,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid ID" });
       }
-
-      const deleted = await storage.deleteSavingsEntry(id);
-      if (!deleted) {
+      const { rowCount } = await pool.query(
+        "DELETE FROM savings WHERE id = $1",
+        [id]
+      );
+      if (rowCount === 0) {
         return res.status(404).json({ message: "Entry not found" });
       }
-
       res.json({ message: "Entry deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete savings entry" });
@@ -52,7 +61,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get savings goal
   app.get("/api/goal", async (req, res) => {
     try {
-      const goal = await storage.getGoal();
+      const { rows } = await pool.query(
+        "SELECT amount FROM goals ORDER BY id DESC LIMIT 1"
+      );
+      const goal = rows[0]?.amount || 100000;
       res.json({ goal });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch goal" });
@@ -63,12 +75,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/goal", async (req, res) => {
     try {
       const { goal } = req.body;
-      if (!goal || typeof goal !== 'number' || goal <= 0) {
+      if (!goal || typeof goal !== "number" || goal <= 0) {
         return res.status(400).json({ message: "Invalid goal amount" });
       }
-
-      const updatedGoal = await storage.setGoal(goal);
-      res.json({ goal: updatedGoal });
+      await pool.query(
+        "INSERT INTO goals (amount) VALUES ($1)",
+        [goal]
+      );
+      res.json({ goal });
     } catch (error) {
       res.status(500).json({ message: "Failed to update goal" });
     }
