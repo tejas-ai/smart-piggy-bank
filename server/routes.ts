@@ -5,7 +5,7 @@ import { insertSavingsEntrySchema } from "@shared/schema";
 import { z } from "zod";
 
 // Connect to your database helper
-const pool = require("../database.js");
+const pool = require("./database.js");
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all savings entries

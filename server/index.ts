@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Connect to the Railway Postgres database
-const pool = require("../database.js");
+const pool = require("./database.js");
 
 // Automatically create tables if they don’t exist
 async function setupDatabase() {
